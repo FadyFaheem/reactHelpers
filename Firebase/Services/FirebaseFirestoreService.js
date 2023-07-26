@@ -9,6 +9,8 @@ import {
   getDoc,
   addDoc,
   deleteDoc,
+  query,
+  where,
 } from "firebase/firestore";
 
 const db = getFirestore(app);
@@ -37,6 +39,24 @@ const getAllDocuments = async (collectionName) => {
   return docs;
 };
 
+const getAllDocumentsFiltered = async (
+  collectionName,
+  fieldID,
+  operator,
+  fieldVal
+) => {
+  const q = query(
+    collection(db, collectionName),
+    where(fieldID, operator, fieldVal)
+  );
+  const querySnapshot = await getDocs(q);
+  const docs = [];
+  querySnapshot.forEach((doc) => {
+    docs.push({ ...doc.data(), id: doc.id });
+  });
+  return docs;
+};
+
 const updateDocument = async (collectionName, id, data) => {
   const docRef = doc(db, collectionName, id);
   const docSnap = await getDoc(docRef);
@@ -58,6 +78,7 @@ const FirebaseFirestoreService = {
   createDocument,
   getDocument,
   getAllDocuments,
+  getAllDocumentsFiltered,
   updateDocument,
   removeDocument,
 };
